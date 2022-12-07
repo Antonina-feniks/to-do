@@ -1,96 +1,110 @@
 document.toDo = {
-    variable: '',
-    controls: {
-        container: undefined,
-        wrapper: undefined,
-        items: undefined,
-        input: undefined
-    }
-}
-
+  variable: "",
+  controls: {
+    container: undefined,
+    wrapper: undefined,
+    items: undefined,
+    input: undefined,
+  },
+};
+//создание div container
 function createContainer() {
-    var container = document.createElement('div');
-    container.classList.add('container');
+  var container = document.createElement("div");
+  container.classList.add("container");
 
-    document.toDo.controls.container = container;
+  document.toDo.controls.container = container;
 
-    var app = document.getElementById('app')
-    if (app){
-        app.append(container);
-    }
+  var app = document.getElementById("app");
+  if (app) {
+    app.append(container);
+  }
 }
 
 function createWrapper() {
-    var { container } = document.toDo.controls;
-    var wrapper = document.createElement('div');
-    wrapper.classList.add('wrapper');
-    container.append(wrapper);
-}
-
-//присваиваем значение введенного в поле переменной
-function onChangeInput(event) {
-    const {toDo} = document;
-    toDo.variable = event.target.value;
+  var { container } = document.toDo.controls;
+  var wrapper = document.createElement("div");
+  wrapper.classList.add("wrapper");
+  container.append(wrapper);
+  document.toDo.controls.wrapper = wrapper;
 }
 
 function createItem(text) {
+  var item = document.createElement("div");
+  item.classList.add("item");
 
-    var item = document.createElement('div');
-    item.classList.add('item');
+  var span = document.createElement("span");
+  span.innerText = text;
+  span.classList.add("text-content");
+  item.append(span);
 
-    var  span = document.createElement('span');
-    span.innerText = text;
-    item.append(span);
+  //иконка чек бокса
+  var iconComplete = document.createElement("i");
+  iconComplete.classList.add("fa");
+  iconComplete.classList.add("fa-check-circle-o");
+  iconComplete.addEventListener("click", (event) => {
+    var parentItem = event.target.parentNode;
+    parentItem.classList.toggle("item_completed");
+    console.dir(event.target);
+    //document.toDo.controls.items.removeChild(event.target)
+  });
 
-    var items = document.querySelector('#app > .container > .wrapper > .items')
-    if (items){
-        items.append(item);
-        return true;
-    }
+  item.insertAdjacentElement("afterbegin", iconComplete);
+
+  //иконка корзинки
+  var iconTrash = document.createElement("i");
+  iconTrash.classList.add("fa");
+  iconTrash.classList.add("fa-trash");
+  //удаление строки при клике на иконку
+  iconTrash.addEventListener("click", (event) => {
+    item.remove();
+  });
+  item.insertAdjacentElement("beforeend", iconTrash);
+
+  var items = document.querySelector("#app > .container > .wrapper > .items");
+  if (items) {
+    items.insertAdjacentElement("afterbegin", item);
+    return true;
+  }
 }
 
-function onKeyDownInput(event) {
-    // обработчик интер по полю ввода
-    const {toDo} = document;
-    if(event.key == "Enter" && toDo.variable !== ''){
-      var isCreated = createItem(toDo.variable);
+function onKeyUpInput(event) {
+  // обработчик интер по полю ввода
+  const { toDo } = document;
+  if (event.key === "Enter" && toDo.variable !== "") {
+    var isCreated = createItem(toDo.variable);
 
-      if (isCreated){
-          document.toDo.variable = '';
-          var input = document.querySelector('#app > .container > .wrapper > .input');
-          input.value = '';
-      }
+    if (isCreated) {
+      document.toDo.variable = "";
+      document.toDo.controls.input.value = "";
     }
-
+  }
 }
 
+function onChangeInput(event) {
+  document.toDo.variable = event.target.value;
+}
 
 function createInput() {
-    var input = document.createElement('input');
-    input.classList.add('input');
-    input.addEventListener('change', onChangeInput)
-    input.addEventListener('keydown', onKeyDownInput)
-
-    var wrapper = document.querySelector('#app > .container > .wrapper')
-    if (wrapper){
-        wrapper.append(input);
-    }
+  var input = document.createElement("input");
+  input.classList.add("input");
+  input.addEventListener("change", onChangeInput);
+  input.addEventListener("keyup", onKeyUpInput);
+  document.toDo.controls.input = input;
+  document.toDo.controls.wrapper.append(input);
 }
 
 function createItems() {
-    var items = document.createElement('div');
-    items.classList.add('items');
-    var wrapper = document.querySelector('#app > .container > .wrapper')
-    if (wrapper){
-        wrapper.append(items);
-    }
+  var items = document.createElement("div");
+  items.classList.add("items");
+  document.toDo.controls.items = items;
+  document.toDo.controls.wrapper.append(items);
 }
 
 function init() {
-    createContainer();
-    createWrapper();
-    createInput();
-    createItems()
+  createContainer();
+  createWrapper();
+  createInput();
+  createItems();
 }
 
 document.addEventListener("DOMContentLoaded", init);
